@@ -18,11 +18,12 @@ class AttentiveTransformer(layers.Layer):
   The output shape of this layer is (1, num_features).
 
   """
-  def __init__(self, seed=None):
+  def __init__(self, seed=None, relaxation_factor=1.0):
     super(AttentiveTransformer, self).__init__()
     self.batch_norm = layers.BatchNormalization()
     self.sparsemax = Sparsemax()
     self.seed = seed # for unit tests
+    self.relaxation_factor = relaxation_factor
 
   def build(self, input_shape):
     if len(input_shape) != 2:
@@ -39,5 +40,9 @@ class AttentiveTransformer(layers.Layer):
     x = self.fc(inputs)
     x = self.batch_norm(x)
     x = tf.multiply(x, self.prior_scales)
-    return self.sparsemax(x)
+    mask = self.sparsemax(x)
+
+    # Update prior_scales
+    self.prior_scales.assign(self.prior_scales * (self.relaxation_factor - mask))
+    return mask
 
