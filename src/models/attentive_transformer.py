@@ -1,6 +1,7 @@
 # Implementation of attentive transformer
 
 import tensorflow as tf
+from tensorflow import keras
 from keras import layers
 from models.sparsemax import Sparsemax
 
