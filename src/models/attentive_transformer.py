@@ -1,12 +1,10 @@
 # Implementation of attentive transformer
 
 import tensorflow as tf
-from tensorflow import keras
-from keras import layers
 from models.sparsemax import Sparsemax
 
 
-class AttentiveTransformer(layers.Layer):
+class AttentiveTransformer(tf.keras.layers.Layer):
   """
   Attentive Transformer as introduced in the TabNet architecture.
   
@@ -46,7 +44,7 @@ class AttentiveTransformer(layers.Layer):
 
   def __init__(self, seed=None, relaxation_factor=1.0):
     super(AttentiveTransformer, self).__init__()
-    self.batch_norm = layers.BatchNormalization()
+    self.batch_norm = tf.keras.layers.BatchNormalization()
     self.sparsemax = Sparsemax()
     self.seed = seed # for unit tests
     self.relaxation_factor = relaxation_factor
@@ -64,7 +62,7 @@ class AttentiveTransformer(layers.Layer):
     batch_size = input_shape[0]
     num_features = input_shape[-1]
 
-    self.fc = layers.Dense(units=num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
+    self.fc = tf.keras.layers.Dense(units=num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
 
   def call(self, inputs):
 
