@@ -1,15 +1,14 @@
 #%%
+import sys
+sys.path.append("/home/melfos/dev/tabnet_tf/src")
 import tensorflow as tf
+from models.attentive_transformer import AttentiveTransformer
+# %%
+input = tf.constant([[1.0,2.0,3.0], [4.0, 5.0, 6.0]], dtype=tf.float32)
+# %%
+model = AttentiveTransformer()
+output = model(input)
 
-# Utilisez cette couche pour le débogage
-layer = tf.keras.layers.Softmax()
-
-# Vos données d'entrée
-logits = tf.constant([[1.0, 2.0, 3.0]])
-
-# Utilisez la couche pour obtenir la sortie (à des fins de débogage)
-output = layer(logits).numpy()
-
-# Ensuite, examinez la sortie et vérifiez si elle est correcte
+# %%
 print(output)
 # %%
