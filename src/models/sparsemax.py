@@ -2,19 +2,45 @@ import tensorflow as tf
 
 class Sparsemax(tf.keras.layers.Layer):
     """
-    Sparsemax activation function.
-
+    Implementation of the Sparsemax activation function as introduced by 
+    André F. T. Martins and Ramón Fernandez Astudillo.
+    
+    The Sparsemax activation transforms the input tensor by projecting it onto the 
+    simplex, producing a sparse output. It's particularly useful as an alternative 
+    to the softmax function where a more sparse representation is desired.
+    
     Arguments:
-    logits -- tensor. Usually, (B, D) with B: batch size and D: number of features
-    axis -- axis where sparsemax will be applied, default is -1 (so it is on features)
+    - None.
 
-    Returns:
-    Tensor of logits' shape
+    Input shape:
+    - 2D tensor: (batch_size, num_features).
+    
+    Output shape:
+    - Same shape as the input.
+
+    Example:
+    ```python
+    layer = Sparsemax()
+    output = layer(input_tensor)
+    ```
+
+    References:
+    - [From Softmax to Sparsemax: A Sparse Model of Attention and Multi-Label Classification](https://arxiv.org/abs/1602.02068)
+
     """
     def __init__(self):
         super(Sparsemax, self).__init__()
     
     def call(self, logits):
+        """
+        Compute the Sparsemax activation value.
+
+        Args:
+            logits (tf.Tensor): Input tensor of shape (batch_size, num_features).
+
+        Returns:
+            tf.Tensor: Transformed tensor with the same shape as the input.
+        """
         z = tf.sort(logits, axis=-1, direction='DESCENDING')
         k_values = 1 + tf.range(tf.shape(logits)[-1], dtype=logits.dtype)
         k_values = tf.expand_dims(k_values, axis=0)
