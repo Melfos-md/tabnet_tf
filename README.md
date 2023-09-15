@@ -44,35 +44,34 @@ Following this:
 
 The function $\text{f}_i$ is the learnable transformation which includes fully connected (FC) layers. Each FC layer should have $N_a + N_d$ neurons.The resulting matrix is then split with the first $N_d$ rows directed to $d[i]$ and the remaining $N_a$ rows directed to $a[i]$.
 
+
+
+
+
+## Utils
+
+### Gated Linear Unit
+
+**Reference**: Dauphin, Y. N., Fan, A., Auli, M., & Grangier, D. (2017). Language Modeling with Gated Convolutional Networks. Proceedings of the 34th International Conference on Machine Learning - Volume 70, ICML'17, 933–941. ([arXiv](https://arxiv.org/pdf/1612.08083.pdf)).
+
+The Gated Linear Unit (GLU) activation function is employed in TabNet. The authors observed an empirical advantage of using GLU over conventional nonlinearities like ReLU.
+
+What I believe: GLUs offer a more refined modulation of information flowing through the network, allowing for a nuanced blend of features, in contrast to the more binary behavior of ReLU (either activated or not). This nuanced control might provide TabNet with enhanced flexibility and performance in handling diverse feature interactions
+
+
+$\text{GLU}(x) = x \odot \sigma(Wx + b)$
+
+where:
+- $x$ is the input
+- $\sigma$ is the sigmoid function
+- $W$ is the weight matrix
+- $b$ the bias vector
+
+In TabNet, the linear transformation is handled by the FC layer. Thus, my implementation of GLU will focus on the sigmoid activation and the element-wise multiplication.
+
+
+
+--------------------
 TODO:
-- FeatureTransformer: Comme vous l'avez mentionné, il y a un bloc partagé et un bloc indépendant pour chaque étape.
-
-- FeatureTransformerShared: Une classe pour le bloc partagé qui sera utilisé dans chaque étape.
-FeatureTransformerStep: Une classe pour le bloc indépendant spécifique à chaque étape.
-
-- TabNetBlock: Une classe qui combine le FeatureTransformer (blocs partagé et indépendant) et l'AttentiveTransformer. Ceci est essentiellement une étape complète de TabNet.
-
-Cette classe va orchestrer:
-
-Le passage des données à travers le FeatureTransformer partagé.
-Le passage des données à travers le FeatureTransformer pour une étape spécifique.
-L'utilisation de l'AttentiveTransformer pour générer le masque.
-L'application du masque à la sortie du FeatureTransformer.
-
-- TabNetModel: Une classe pour l'ensemble du modèle TabNet qui contient N_steps instances du TabNetBlock (où N_steps est le nombre d'étapes).
-
-Cette classe sera responsable de :
-
-Initialiser les différentes étapes.
-Orchestrer le flux de données à travers chaque étape.
-Calculer la perte, y compris le terme de régularisation L_sparse.
-Toutes les autres responsabilités liées au modèle, telles que la sauvegarde/chargement des poids, etc.
-
-- Utils: Diverses fonctions et classes utilitaires.
-
-Par exemple:
-
-SparseRegularization: Si vous voulez modulariser la fonction de perte pour L_sparse.
-Sparsemax: Comme vous l'avez déjà fait.
-Toute autre fonctionnalité d'aide ou couche personnalisée que vous pourriez nécessiter.
-- Main / Trainer: Une classe ou un script pour entraîner, évaluer, et tester votre modèle. Elle gérera la boucle d'entraînement, la validation, l'enregistrement des checkpoints, etc.
+- faire un test de gradient pour sparsemax (comme GLU)
+- Ajouter doc dans README.md pour sparsemax
