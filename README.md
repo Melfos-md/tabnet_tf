@@ -70,6 +70,42 @@ where:
 In TabNet, the linear transformation is handled by the FC layer. Thus, my implementation of GLU will focus on the sigmoid activation and the element-wise multiplication.
 
 
+### Ghost BatchNormalization
+
+
+**Reference**: Neofytos Dimitriou, Ognjen Arandjelovic (2020). A New Look at Ghost Normalization. ([arXiv](https://arxiv.org/pdf/2007.08554.pdf)).
+
+
+Ghost Batch Normalization (GBN) is based on the idea of Batch Normalization (BN), but with a slight twist. In traditional BN, statistics (mean and variance) are computed over the entire batch. In GBN, these statistics are computed over "ghost batches", which are essentially subsets of the original batch
+
+Suppose you have a full batch $B$ splitted into $k$ ghost batches $B_1, B_2, ..., B_k$.
+
+For a specific ghost batch $B_j$, the normalization formula goes as follows:
+
+- Mean
+
+$\mu_{B_j} = \frac{1}{m} \sum_{i=1}^{m} x_i$
+
+where $m$ is the size of the ghost batch $B_j$ and $x_i$ are the inputs within $B_j$.
+
+- Variance
+  
+$\sigma_{B_j}^2 = \frac{1}{m} \sum_{i=1}^{m} (x_i - \mu_{B_j})^2$
+
+- Normalization
+
+$\hat{x_i} = \frac{x_i - \mu_{B_j}}{\sqrt{\sigma_{B_j}^2 + \epsilon}}$
+
+where $\epsilon$ is a small number to prevent division by zero.
+
+- Scaling and shift
+
+$y_i = \gamma \hat{x_i} + \beta$
+
+
+where $\gamma$ and $\beta$ are learnable parameters.
+
+This process is repeated for each ghost batch $B_j$. So, rather than using statistics over the entire full batch, you use the statistics from the relevant ghost batch for each input.
 
 --------------------
 TODO:
