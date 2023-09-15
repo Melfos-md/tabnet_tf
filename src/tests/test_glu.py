@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from models.gated_linear_unit import GLU
+from models.components.gated_linear_unit import GLU
 
 np.random.seed(42)
 tf.random.set_seed(42)

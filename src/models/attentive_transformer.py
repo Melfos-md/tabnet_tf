@@ -1,7 +1,7 @@
 # Implementation of attentive transformer
 
 import tensorflow as tf
-from models.sparsemax import Sparsemax
+from models.components.sparsemax import Sparsemax
 
 
 class AttentiveTransformer(tf.keras.layers.Layer):

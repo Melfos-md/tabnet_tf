@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from models.sparsemax import Sparsemax
+from models.components.sparsemax import Sparsemax
 
 # Check if output sum is 1
 def test_sparsemax_sum():
