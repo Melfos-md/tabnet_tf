@@ -34,7 +34,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
     it combines the output from the first transformation with the original input using an element-wise 
     addition. This combined output is then scaled down by a factor of `sqrt(0.5)` (See note on `sqrt(0.5)` in README.md).
     """
-    def __init__(self, N_a, N_d, virtual_batch_size, shared=True, momentum=0.99, epsilon=1e-5, seed=None, training=None):
+    def __init__(self, N_a, N_d, virtual_batch_size, shared=True, momentum=0.99, epsilon=1e-5, seed=None):
         super(FeatureTransformer, self).__init__()
         self.N_a = N_a
         self.N_d = N_d
@@ -44,7 +44,6 @@ class FeatureTransformer(tf.keras.layers.Layer):
         self.epsilon = epsilon
         self.shared = shared
         self.seed = seed
-        self.training = training
 
         self.fc1 = tf.keras.layers.Dense(units=self.N_fc, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
         self.bn1 = GhostBatchNormalization(self.virtual_batch_size, self.momentum, self.epsilon)
@@ -55,11 +54,11 @@ class FeatureTransformer(tf.keras.layers.Layer):
         self.glu2 = GLU()
 
 
-    def call(self, inputs):
+    def call(self, inputs, training=None):
         if inputs.shape[0] < self.virtual_batch_size:
             raise ValueError(f"Input batch size ({inputs.shape[0]}) should be greater than or equal to the virtual batch size ({self.virtual_batch_size}).")
         x = self.fc1(inputs)
-        x = self.bn1(x, training=self.training)
+        x = self.bn1(x, training=training)
         res = self.glu1(x)
 
         if not self.shared:
@@ -69,7 +68,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
                 res = (res + inputs) * tf.math.sqrt(0.5)
 
         x = self.fc2(res)
-        x = self.bn2(x, training=self.training)
+        x = self.bn2(x, training=training)
         x = self.glu2(x)
 
         x = (x + res) * tf.math.sqrt(0.5)
