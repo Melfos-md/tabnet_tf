@@ -22,6 +22,11 @@ class FeatureTransformer(tf.keras.layers.Layer):
     - seed (int, optional): Random seed for initializers.
     - training (bool, optional): Training mode flag for Ghost Batch Normalization.
 
+    Methods:
+    - `call(inputs)`
+        - `inputs` (Tensor): Input tensor of shape `(batch_size, num_features)`
+
+    Returns: A tensor of shape `(batch_size, N_a + N_d)`
     During the `call` method, the layer checks if the input batch size is larger than or equal to the 
     virtual batch size. This check ensures the correct operation of the Ghost Batch Normalization. 
     It then processes the input through two transformation blocks, consisting of a Dense layer, 
