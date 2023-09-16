@@ -40,13 +40,29 @@ Following this:
 - $\mathbf{M[i]} \odot \mathbf{f}$ is an element-wise multiplication so the result is of shape $(B, D)$
 - Consequently, $[\mathbf{d[i]}, \mathbf{a[i]}]$ possesses a shape of $(B, N_a + N_d)$
 
-
-
 The function $\text{f}_i$ is the learnable transformation which includes fully connected (FC) layers. Each FC layer should have $N_a + N_d$ neurons.The resulting matrix is then split with the first $N_d$ rows directed to $d[i]$ and the remaining $N_a$ rows directed to $a[i]$.
 
 
+***Note on the $\sqrt{0.5}$***
 
 
+Residual connections in neural networks involve adding the output of one layer to the output of one or more previous layers. This can be beneficial in deep architectures to mitigate the vanishing gradient problem and improve convergence.
+
+When performing an element-wise addition of two tensors, the variance of the output can increase. To understand why, consider:
+
+Let $X$ and $Y$ be two independent random variables with the same variance $\sigma^2$. The variance of their sum is:
+
+$\text{Var}(X + Y) = 2 \times \sigma^2$
+
+To keep the variance of the sum consistent with $\sigma^2$, we would divide the sum by $\sqrt{2}$:
+
+$\text{Var} \left( \frac{X + Y}{\sqrt{2}} \right) = \sigma^2$
+
+This reasoning underpins the division by $\sqrt{2}$ (= multiply by $\sqrt{0.5}$) after adding residual connections. It aims to stabilize variance across layers.
+
+Reference: Gehring, J.; Auli, M.; Grangier, D.; Yarats, D.; and Dauphin,
+Y. N. 2017. Convolutional Sequence to Sequence Learning.
+arXiv:1705.03122 .
 
 ## Utils
 
@@ -111,3 +127,4 @@ This process is repeated for each ghost batch $B_j$. So, rather than using stati
 TODO:
 - faire un test de gradient pour sparsemax (comme GLU)
 - Ajouter doc dans README.md pour sparsemax
+- Implementer L_sparse

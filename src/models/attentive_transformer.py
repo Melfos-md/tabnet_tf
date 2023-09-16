@@ -59,7 +59,6 @@ class AttentiveTransformer(tf.keras.layers.Layer):
     """
     if len(input_shape) != 2:
       raise ValueError("Expected input shape (batch_size, num_features), but received a different shape")
-    batch_size = input_shape[0]
     num_features = input_shape[-1]
 
     self.fc = tf.keras.layers.Dense(units=num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
