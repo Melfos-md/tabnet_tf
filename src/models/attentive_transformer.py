@@ -42,8 +42,9 @@ class AttentiveTransformer(tf.keras.layers.Layer):
   - [TabNet: Attentive Interpretable Tabular Learning](https://arxiv.org/abs/1908.07442)
   """
 
-  def __init__(self, seed=None, relaxation_factor=1.0):
+  def __init__(self, num_features, relaxation_factor=1.0, seed=None):
     super(AttentiveTransformer, self).__init__()
+    self.num_features = num_features
     self.batch_norm = tf.keras.layers.BatchNormalization()
     self.sparsemax = Sparsemax()
     self.seed = seed # for unit tests
@@ -59,9 +60,8 @@ class AttentiveTransformer(tf.keras.layers.Layer):
     """
     if len(input_shape) != 2:
       raise ValueError("Expected input shape (batch_size, num_features), but received a different shape")
-    num_features = input_shape[-1]
 
-    self.fc = tf.keras.layers.Dense(units=num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
+    self.fc = tf.keras.layers.Dense(units=self.num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
 
   def call(self, inputs, training=None):
 
@@ -76,15 +76,15 @@ class AttentiveTransformer(tf.keras.layers.Layer):
     """
     # Initialize prior_scales if it's the first call
     if self.prior_scales is None:
-      initial_value = tf.ones_like(inputs)
+      initial_value = tf.ones((inputs.shape[0], self.num_features)) # (batch_size, num_features) same as features and mask
       self.prior_scales = tf.Variable(initial_value, trainable=False, dtype=tf.float32)
 
-    x = self.fc(inputs)
+    x = self.fc(inputs) 
     x = self.batch_norm(x, training=training)
     x = tf.multiply(x, self.prior_scales)
     mask = self.sparsemax(x)
 
     # Update prior_scales
     self.prior_scales.assign(self.prior_scales * (self.relaxation_factor - mask))
-    return mask
+    return mask # must be (batch_size, num_features)
 
