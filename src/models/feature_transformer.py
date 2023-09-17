@@ -34,7 +34,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
     it combines the output from the first transformation with the original input using an element-wise 
     addition. This combined output is then scaled down by a factor of `sqrt(0.5)` (See note on `sqrt(0.5)` in README.md).
     """
-    def __init__(self, N_a, N_d, virtual_batch_size, shared=True, momentum=0.99, epsilon=1e-5, seed=None):
+    def __init__(self, N_a, N_d, virtual_batch_size=256, shared=True, momentum=0.99, epsilon=1e-5, seed=None):
         super(FeatureTransformer, self).__init__()
         self.N_a = N_a
         self.N_d = N_d
