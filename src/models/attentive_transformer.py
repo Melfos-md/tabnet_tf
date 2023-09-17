@@ -32,6 +32,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
 
 
   Attributes:
+  - num_features: number of features (from dataset), as it is the number of Dense layer units
   - batch_norm (layers.BatchNormalization): Batch normalization layer.
   - sparsemax (Sparsemax): Custom Sparsemax activation function.
   - seed (int or None): Random seed for the dense layer initialization.
