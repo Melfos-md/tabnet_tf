@@ -63,7 +63,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
 
     self.fc = tf.keras.layers.Dense(units=num_features, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
 
-  def call(self, inputs):
+  def call(self, inputs, training=None):
 
     """
     Compute the Attentive Transformer's output mask.
@@ -80,7 +80,7 @@ class AttentiveTransformer(tf.keras.layers.Layer):
       self.prior_scales = tf.Variable(initial_value, trainable=False, dtype=tf.float32)
 
     x = self.fc(inputs)
-    x = self.batch_norm(x)
+    x = self.batch_norm(x, training=training)
     x = tf.multiply(x, self.prior_scales)
     mask = self.sparsemax(x)
 
