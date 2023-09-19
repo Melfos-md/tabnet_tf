@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class GhostBatchNormalization(tf.keras.layers.Layer):
-    def __init__(self, virtual_batch_size, momentum=0.99, epsilon=1e-5):
+    def __init__(self, virtual_batch_size=256, momentum=0.99, epsilon=1e-5):
         super(GhostBatchNormalization, self).__init__()
         self.virtual_batch_size = virtual_batch_size
         self.momentum = momentum

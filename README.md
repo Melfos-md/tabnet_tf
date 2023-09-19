@@ -125,6 +125,7 @@ This process is repeated for each ghost batch $B_j$. So, rather than using stati
 
 --------------------
 TODO:
-- faire un test de gradient pour sparsemax (comme GLU)
+- reprendre aux tests unitaires de tabnet_encoder
+- écrire un test unitaire pour vérifier que chaque ligne d'un masque = 1
 - Ajouter doc dans README.md pour sparsemax
 - Implementer L_sparse
