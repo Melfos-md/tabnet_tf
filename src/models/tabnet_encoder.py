@@ -3,7 +3,7 @@ import tensorflow as tf
 from .attentive_transformer import AttentiveTransformer
 from .feature_transformer import FeatureTransformer
 
-class TabNetEncoder(tf.keras.layers.Layer):
+class TabNetEncoder(tf.keras.Model):
     # Inputs
     # - previous_activation: activation from previous step a[i-1]
     # - features
@@ -48,7 +48,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
                                                       epsilon=self.epsilon,
                                                       seed=self.seed)
         self.input_bn = tf.keras.layers.BatchNormalization(momentum=self.momentum, epsilon=self.epsilon)
-        self.layers = [] # [[AttentiveTransformer, Step dependent FeatureTransformer] * N_step]
+        self.tabnet_layers = [] # [[AttentiveTransformer, Step dependent FeatureTransformer] * N_step]
         for _ in range(self.N_step):
             attentive_transformer = AttentiveTransformer(num_features=self.num_features, relaxation_factor=self.relaxation_factor, 
                                                           seed=self.seed)
@@ -59,7 +59,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
                                               momentum=self.momentum,
                                               epsilon=self.epsilon,
                                               seed=self.seed)
-            self.layers.append([attentive_transformer, feature_transformer])
+            self.tabnet_layers.append([attentive_transformer, feature_transformer])
 
         self.relu = tf.keras.layers.ReLU()
 
@@ -85,7 +85,7 @@ class TabNetEncoder(tf.keras.layers.Layer):
         decision_out = 0
         agg_mask = 0
         
-        for attentive_transformer, feature_transformer in self.layers:
+        for attentive_transformer, feature_transformer in self.tabnet_layers:
             mask = attentive_transformer(activation, training=training) # ith step AttentiveTransformer
             x = features * mask
             x = self.feature_transformer_shared(x, training=training)
