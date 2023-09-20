@@ -89,14 +89,16 @@ In TabNet, the linear transformation is handled by the FC layer. Thus, my implem
 ### Ghost BatchNormalization
 
 
-**Reference**: Neofytos Dimitriou, Ognjen Arandjelovic (2020). A New Look at Ghost Normalization. ([arXiv](https://arxiv.org/pdf/2007.08554.pdf)).
+**References**: 
+- Hoffer, E.; Hubara, I.; and Soudry, D. 2017. Train longer, generalize better: closing the generalization gap in large batch training of neural networks. ([arXiv:1705.08741](https://arxiv.org/pdf/1705.08741.pdf)).
+- Neofytos Dimitriou, Ognjen Arandjelovic (2020). A New Look at Ghost Normalization. ([arXiv:2007.08554](https://arxiv.org/pdf/2007.08554.pdf)).
 
 
-Ghost Batch Normalization (GBN) is based on the idea of Batch Normalization (BN), but with a slight twist. In traditional BN, statistics (mean and variance) are computed over the entire batch. In GBN, these statistics are computed over "ghost batches", which are essentially subsets of the original batch
+Ghost Batch Normalization (GBN) is a variation of the conventional Batch Normalization (BN) technique. While BN computes normalization statistics (mean and variance) over the entire batch, GBN calculates these statistics over "ghost batches". These ghost batches are subpartitions of the original batch.
 
-Suppose you have a full batch $B$ splitted into $k$ ghost batches $B_1, B_2, ..., B_k$.
+Let's consider a full batch $B$ divided into $k$ ghost batches $B_1, B_2, ..., B_k$.
 
-For a specific ghost batch $B_j$, the normalization formula goes as follows:
+For a specific ghost batch $B_j$, the normalization procedure is as follows:
 
 - Mean
 
@@ -119,9 +121,10 @@ where $\epsilon$ is a small number to prevent division by zero.
 $y_i = \gamma \hat{x_i} + \beta$
 
 
-where $\gamma$ and $\beta$ are learnable parameters.
+where $\gamma$ and $\beta$ are learnable parameters of the model.
 
-This process is repeated for each ghost batch $B_j$. So, rather than using statistics over the entire full batch, you use the statistics from the relevant ghost batch for each input.
+This methodology is applied to each ghost batch $B_j$. So, rather than applying statistics over the entire batch, GBN uses the statistics specific to the corresponding ghost batch for each subset of inputs.
+
 
 --------------------
 TODO:
