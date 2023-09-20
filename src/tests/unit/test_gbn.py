@@ -8,8 +8,9 @@ np.random.seed(42)
 tf.random.set_seed(42)
 
 def test_gbn_output_shape():
-    gbn = GhostBatchNormalization(virtual_batch_size=32)
-    input = tf.random.normal(shape=(128, 64))
+    batch_size = 128
+    gbn = GhostBatchNormalization(batch_size=batch_size, virtual_batch_size=32)
+    input = tf.random.normal(shape=(batch_size, 64))
     output = gbn(input, training=True)
 
     assert input.shape == output.shape
@@ -21,10 +22,11 @@ def test_ghost_batchnorm_mean_variance():
     """
     VIRTUAL_BATCH_SIZE = 32
     EPSILON = 1e-4
+    batch_size = 128
 
-    gbn = GhostBatchNormalization(virtual_batch_size=VIRTUAL_BATCH_SIZE)
+    gbn = GhostBatchNormalization(batch_size=batch_size, virtual_batch_size=VIRTUAL_BATCH_SIZE)
 
-    input_data = tf.random.normal(shape=(128, 64))
+    input_data = tf.random.normal(shape=(batch_size, 64))
 
     output = gbn(input_data, training=True)
 
@@ -41,12 +43,13 @@ def test_ghost_batchnorm_mean_variance():
 
 
 def test_ghost_batchnorm_inference():
-    INPUT_SHAPE = 128, 64
+    batch_size = 128
+    num_features = 64
 
-    gbn = GhostBatchNormalization(virtual_batch_size=32)
+    gbn = GhostBatchNormalization(batch_size=batch_size, virtual_batch_size=32)
 
-    training_data = tf.random.normal(shape=INPUT_SHAPE)
-    inference_data = tf.random.normal(shape=INPUT_SHAPE)
+    training_data = tf.random.normal(shape=(batch_size, num_features))
+    inference_data = tf.random.normal(shape=(batch_size, num_features))
 
     # Force training by passing `training=True`
     _ = gbn(training_data, training=True)
@@ -54,4 +57,4 @@ def test_ghost_batchnorm_inference():
     # Inference
     inference_output = gbn(inference_data, training=False)
 
-    assert inference_output.shape == INPUT_SHAPE
+    assert inference_output.shape == (batch_size, num_features)
