@@ -34,7 +34,7 @@ class FeatureTransformer(tf.keras.layers.Layer):
     it combines the output from the first transformation with the original input using an element-wise 
     addition. This combined output is then scaled down by a factor of `sqrt(0.5)` (See note on `sqrt(0.5)` in README.md).
     """
-    def __init__(self, N_a, N_d, shared, virtual_batch_size=256, momentum=0.99, epsilon=1e-5, seed=None):
+    def __init__(self, N_a, N_d, shared, batch_size, virtual_batch_size=256, momentum=0.99, epsilon=1e-5, seed=None):
         super(FeatureTransformer, self).__init__()
         self.N_a = N_a
         self.N_d = N_d
@@ -44,13 +44,14 @@ class FeatureTransformer(tf.keras.layers.Layer):
         self.epsilon = epsilon
         self.shared = shared
         self.seed = seed
+        self.batch_size = batch_size
 
         self.fc1 = tf.keras.layers.Dense(units=self.N_fc, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
-        self.bn1 = GhostBatchNormalization(self.virtual_batch_size, self.momentum, self.epsilon)
+        self.bn1 = GhostBatchNormalization(self.batch_size, self.virtual_batch_size, self.momentum, self.epsilon)
         self.glu1 = GLU()
 
         self.fc2 = tf.keras.layers.Dense(units=self.N_fc, activation=None, kernel_initializer=tf.keras.initializers.GlorotUniform(seed=self.seed))
-        self.bn2 = GhostBatchNormalization(self.virtual_batch_size, self.momentum, self.epsilon)
+        self.bn2 = GhostBatchNormalization(self.batch_size, self.virtual_batch_size, self.momentum, self.epsilon)
         self.glu2 = GLU()
 
 
