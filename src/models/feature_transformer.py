@@ -55,8 +55,6 @@ class FeatureTransformer(tf.keras.layers.Layer):
 
 
     def call(self, inputs, training=None):
-        if inputs.shape[0] < self.virtual_batch_size:
-            raise ValueError(f"Input batch size ({inputs.shape[0]}) should be greater than or equal to the virtual batch size ({self.virtual_batch_size}).")
         x = self.fc1(inputs)
         x = self.bn1(x, training=training)
         res = self.glu1(x)

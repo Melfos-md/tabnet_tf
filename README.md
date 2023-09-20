@@ -125,7 +125,37 @@ This process is repeated for each ghost batch $B_j$. So, rather than using stati
 
 --------------------
 TODO:
-- reprendre aux tests unitaires de tabnet_encoder
 - écrire un test unitaire pour vérifier que chaque ligne d'un masque = 1
 - Ajouter doc dans README.md pour sparsemax
 - Implementer L_sparse
+- finir la doc mathématique de README
+- Réfléchir à la prise en charge du dernier batch dans FeatureTransformer/ GBN... => J'ai retiré tout contrôle de la taille de virtual batch size vs batch size
+  - pour l'instant on met un "drop_remainder":
+
+The most appropriate solution depends on the specifics of your use case and the importance of every data point in your training set. Here are the pros and cons of the potential solutions:
+
+Adjust the Batch Size:
+
+Pros: Ensures all data is used for training.
+Cons: Might not be optimal for model convergence or GPU memory utilization.
+Drop the Last Batch:
+
+Pros: Quick and easy solution. Ensures that all batches are of the same size, which can be beneficial for certain optimization algorithms and GPU memory utilization.
+Cons: You lose a small portion of your training data. If your dataset is already small, this might not be ideal.
+Adjust the Virtual Batch Size:
+
+Pros: Allows you to use smaller actual batch sizes while still benefiting from the regularization effect of a larger virtual batch size.
+Cons: Might reduce the regularization effect of Ghost Batch Normalization if set too low.
+Pad the Last Batch:
+
+Pros: Ensures all data is used for training.
+Cons: Introduces artificial data points which might affect training dynamics. Requires a mechanism to ignore these points during loss computation.
+Given these options:
+
+If every data point is crucial and you cannot afford to lose any, consider adjusting the batch size or padding the last batch.
+
+If you're using Ghost Batch Normalization primarily for its regularization effect and not for computational reasons, consider adjusting the virtual batch size.
+
+If you have a large dataset and losing a few data points from the last batch isn't a big concern, dropping the last batch is the simplest solution.
+
+For many practical scenarios with large datasets, dropping the last batch is a common approach because the potential negative impact on model performance is minimal. However, if your dataset is small or if every data point is crucial, you might want to consider one of the other options."

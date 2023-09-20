@@ -104,6 +104,8 @@ class TabNetEncoder(tf.keras.Model):
         if self.target_is_discrete and not training:
             prediction = tf.argmax(prediction, axis=-1)
 
-
-        return agg_mask, prediction
+        if training:
+            return agg_mask, prediction
+        else:
+            return prediction
         
