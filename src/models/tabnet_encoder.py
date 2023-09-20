@@ -15,6 +15,7 @@ class TabNetEncoder(tf.keras.Model):
             self,
             target_is_discrete, # true if target is a discrete variable
             N_step,
+            batch_size, # for feature transformer/GBN graph creation
             num_features, # for attentive transformer
             output_units=1, # units of final dense layer: 1 for binary classification or regression, number of class for multiclass classification
             # Feature transformer hyperparameters
@@ -31,6 +32,7 @@ class TabNetEncoder(tf.keras.Model):
         self.N_step = N_step
         self.target_is_discrete = target_is_discrete
         self.output_units = output_units
+        self.batch_size = batch_size
         self.num_features = num_features
         self.N_a = N_a
         self.N_d = N_d
@@ -43,6 +45,7 @@ class TabNetEncoder(tf.keras.Model):
         self.input_feature_transformer = FeatureTransformer(N_a=self.N_a,
                                                       N_d=self.N_d,
                                                       shared=False,
+                                                      batch_size=self.batch_size,
                                                       virtual_batch_size=self.virtual_batch_size,
                                                       momentum=self.momentum,
                                                       epsilon=self.epsilon,
@@ -55,6 +58,7 @@ class TabNetEncoder(tf.keras.Model):
             feature_transformer = FeatureTransformer(N_a=self.N_a,
                                               N_d=self.N_d,
                                               shared=False,
+                                              batch_size=self.batch_size,
                                               virtual_batch_size=self.virtual_batch_size,
                                               momentum=self.momentum,
                                               epsilon=self.epsilon,
@@ -66,6 +70,7 @@ class TabNetEncoder(tf.keras.Model):
         self.feature_transformer_shared = FeatureTransformer(N_a=self.N_a,
                                                       N_d=self.N_d,
                                                       shared=True,
+                                                      batch_size=self.batch_size,
                                                       virtual_batch_size=self.virtual_batch_size,
                                                       momentum=self.momentum,
                                                       epsilon=self.epsilon,

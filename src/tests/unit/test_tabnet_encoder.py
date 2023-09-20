@@ -20,7 +20,7 @@ def test_output_shape():
     features = tf.constant(np.random.rand(batch_size, num_features))
 
     # Initialize and call the TabNetEncoder model
-    model = TabNetEncoder(target_is_discrete=False, output_units=output_units, N_step=4, num_features=num_features, N_a=N_a, N_d=N_d, seed=SEED)
+    model = TabNetEncoder(target_is_discrete=False, output_units=output_units, N_step=4, batch_size=batch_size, num_features=num_features, N_a=N_a, N_d=N_d, seed=SEED)
     agg_mask, decision_out = model(features, training=True)
 
     # Check if the output shapes match the expected shapes
