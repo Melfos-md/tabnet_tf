@@ -35,7 +35,7 @@ class GhostBatchNormalization(tf.keras.layers.Layer):
         """
         super(GhostBatchNormalization, self).__init__()
         if batch_size % virtual_batch_size != 0:
-            raise ValueError("batch_size doit être un multiple de virtual_batch_size.")
+            raise ValueError("batch_size must be a multiple of virtual_batch_size.")
         self.batch_size = batch_size
         self.virtual_batch_size = virtual_batch_size
         self.momentum = momentum
