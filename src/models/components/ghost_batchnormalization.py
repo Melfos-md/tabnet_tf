@@ -14,6 +14,8 @@ class GhostBatchNormalization(tf.keras.layers.Layer):
 
     A design choice made here is to force user to choose a virtual batch size that divides the batch size without any remainder.
 
+    WARNING: There is no check if batch_size attribute match the actual `inputs` shape since I did not found a solution to check it in graph mode.
+
     Attributes:
     - virtual_batch_size (int): Size of each virtual batch.
     - momentum (float): Momentum for the moving average in batch normalization.
@@ -40,7 +42,7 @@ class GhostBatchNormalization(tf.keras.layers.Layer):
         self.virtual_batch_size = virtual_batch_size
         self.momentum = momentum
         self.epsilon = epsilon
-        self.bn_layers = [tf.keras.layers.BatchNormalization(momentum=self.momentum, epsilon=self.epsilon) 
+        self.bn_layers = [tf.keras.layers.BatchNormalization(axis=-1, momentum=self.momentum, epsilon=self.epsilon) 
                           for _ in range(batch_size // virtual_batch_size)]
 
     
@@ -55,10 +57,6 @@ class GhostBatchNormalization(tf.keras.layers.Layer):
         Returns:
         - tf.Tensor: Output tensor after applying ghost batch normalization.
         """
-
-        if tf.shape(inputs)[0] != self.batch_size:
-            raise ValueError(f"'inputs' first dimension should be {self.batch_size}, but found {tf.shape(inputs)[0]}.")
-
         outputs = []
         for i, bn in enumerate(self.bn_layers):
             start = i * self.virtual_batch_size

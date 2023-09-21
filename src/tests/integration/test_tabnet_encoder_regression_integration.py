@@ -12,14 +12,15 @@ def test_tabnet_encoder_regression_integration_1():
     batch_size = 512
     N_a = N_d = 8
     num_features = 64
+    data_size = batch_size * 3
     output_units = 1
 
     # Generate random input features and targets
-    features = tf.constant(np.random.rand(batch_size, num_features), dtype=tf.float32)
-    targets = tf.constant(np.random.rand(batch_size, output_units), dtype=tf.float32)
+    features = tf.constant(np.random.rand(data_size, num_features), dtype=tf.float32)
+    targets = tf.constant(np.random.rand(data_size, output_units), dtype=tf.float32)
 
     # Initialize the TabNetEncoder model
-    model = TabNetEncoder(target_is_discrete=False, output_units=output_units, N_step=4, num_features=num_features, N_a=N_a, N_d=N_d, seed=SEED)
+    model = TabNetEncoder(target_is_discrete=False, output_units=output_units, N_step=4, batch_size=batch_size, num_features=num_features, N_a=N_a, N_d=N_d, seed=SEED)
 
     # Compile the model with a regression loss
     model.compile(optimizer='adam', loss='mean_squared_error')
@@ -34,46 +35,39 @@ def test_tabnet_encoder_regression_integration_1():
     predictions = model.predict(features, batch_size=batch_size)
 
     # Check the shape of the predictions
-    assert predictions.shape == (batch_size, output_units), f"Expected predictions shape {(batch_size, output_units)}, but got {predictions.shape}"
+    assert predictions.shape == (data_size, output_units), f"Expected predictions shape {(batch_size, output_units)}, but got {predictions.shape}"
 
 
 
 def test_tabnet_encoder_regression_integration_2():
-
-    
-    # Generate synthetic data
-    X, y = generate_synthetic_data(num_samples=1280, num_features=10, seed=SEED) # 1280 = 1024 + 256 (train + val)
-    
-    # Split data into training and validation sets
-    X_train, X_val = X[:1024], X[1024:]
-    y_train, y_val = y[:1024], y[1024:]
-
-    # Hyperparameters
+    batch_size = 256
+    num_features = 10
+    num_samples = batch_size * 10
     N_step = 4
-    num_features = X_train.shape[1]
     N_a = N_d = 2
     virtual_batch_size = 32
-    batch_size = 32
-
-    dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-    dataset = dataset.shuffle(buffer_size=len(X_train)).batch(batch_size)
-    val_dataset = tf.data.Dataset.from_tensor_slices((X_val, y_val)).batch(batch_size)
-
     
+    # Generate synthetic data
+    X, y = generate_synthetic_data(num_samples=num_samples, num_features=num_features, seed=SEED) # 1280 = 1024 + 256 (train + val)
+    
+    # Split data into training and validation sets
+    split = 8 * batch_size
+    X_train, X_val = X[:split], X[split:]
+    y_train, y_val = y[:split], y[split:]
 
     # Instantiate the TabNetEncoder
-    model = TabNetEncoder(target_is_discrete=False, N_step=N_step, num_features=num_features, 
+    model = TabNetEncoder(target_is_discrete=False, N_step=N_step, batch_size=batch_size, num_features=num_features, 
                           N_a=N_a, N_d=N_d, virtual_batch_size=virtual_batch_size, seed=SEED)
     
     # Compile the model
     model.compile(optimizer='adam', loss='mean_squared_error')
     
     # Train the model
-    model.fit(dataset, epochs=10, batch_size=batch_size) #, validation_data=(X_val, y_val)
+    model.fit(X_train, y_train, epochs=10, batch_size=batch_size, validation_data=(X_val, y_val))
     
     # Evaluate the model
-    #mse = model.evaluate(val_dataset)
+    mse = model.evaluate(X_val, y_val, batch_size=batch_size)
     
     # Assert that the MSE is below a certain threshold
-    #assert mse < 0.1, f"Expected MSE < 0.1 but got {mse}"
+    assert mse < 0.1, f"Expected MSE < 0.1 but got {mse}"
 
